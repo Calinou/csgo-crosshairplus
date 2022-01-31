@@ -81,7 +81,7 @@ func _ready() -> void:
 
 
 func _process(_delta: float) -> void:
-	if Engine.get_idle_frames() % 15 == 0:
+	if Engine.get_idle_frames() % 100 == 0:
 		set_health(int(health_label.text) - 1)
 		# Simulates a Negev + Dual Berettas loadout
 		# (weapons with the highest amount of bullets in a single ammo clip).
