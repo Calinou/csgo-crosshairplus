@@ -23,7 +23,6 @@ class GSIServer extends "res://httpserver.gd":
 	signal ammo_clip_secondary_changed(ammo_clip, ammo_clip_max, weapon_active)
 
 	func _respond(request: Request) -> Response:
-		print("response")
 #		var body := PoolByteArray()
 #		body.append_array(("Method: %s\n" % request.method).to_ascii())
 #		body.append_array(("Path: %s\n" % request.request_path).to_ascii())
@@ -55,8 +54,8 @@ class GSIServer extends "res://httpserver.gd":
 		var secondary_state: String = json.get("player", {}).get("weapons", {}).get("weapon_1", {}).get("state", "")
 		emit_signal("ammo_clip_secondary_changed", ammo_clip_secondary, ammo_clip_secondary_max, secondary_state == "active")
 
+		# Return an empty response (as it's unused by the game).
 		var response := Response.new()
-		response.body = "CS:GO CrosshairPlus GSI".to_ascii()
 		return response
 
 

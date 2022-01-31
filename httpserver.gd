@@ -87,7 +87,8 @@ class RequestParser:
 						return false
 
 				if state == State.SUCCESS:
-					print_debug("Request parsed successfully")
+					if OS.is_stdout_verbose():
+						print("Request parsed successfully")
 					return true
 				if state == State.FAILURE:
 					return false
@@ -214,7 +215,8 @@ func _take_connections() -> void:
 			OS.delay_msec(POLL_DELAY)
 			continue
 		var peer := _server.take_connection()
-		print_debug("Got peer: ", peer.get_connected_host(), ":", peer.get_connected_port())
+		if OS.is_stdout_verbose():
+			print("Got peer: ", peer.get_connected_host(), ":", peer.get_connected_port())
 		var request := Request.new(peer)
 		var request_parser := RequestParser.new(request)
 		if request_parser.fetch():
