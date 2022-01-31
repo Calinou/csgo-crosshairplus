@@ -19,9 +19,9 @@ onready var ammo_clip_secondary_progress := $AmmoClipSecondary/ProgressBar as Pr
 
 class GSIServer extends "res://httpserver.gd":
 	signal health_changed(health)
-	signal ammo_clip_primary_changed(ammo_clip)
-	signal ammo_clip_secondary_changed(ammo_clip)
-	
+	signal ammo_clip_primary_changed(ammo_clip, ammo_clip_max, weapon_active)
+	signal ammo_clip_secondary_changed(ammo_clip, ammo_clip_max, weapon_active)
+
 	func _respond(request: Request) -> Response:
 		print("response")
 #		var body := PoolByteArray()
@@ -34,13 +34,26 @@ class GSIServer extends "res://httpserver.gd":
 #		body.append_array(request.request_data)
 
 		var json: Dictionary = parse_json(request.request_data.get_string_from_ascii())
-		
+
+		# FIXME: Weapon order is not guaranteed. It depends on the order weapons were picked up.
+		# Secondary weapon should be checked by type ("Pistol") instead of slot.
+		# Also, if you spawn with the bomb or pick up any grenades, the weapon order will change.
+		# and ammo bars will no longer function.
+		# (Picking up the bomb after buying a primary weapon will not do this,
+		# as the bomb will be last in the weapon order.)
 		var health: int = json.get("player", {}).get("state", {}).get("health", -1)
-		var ammo_clip_primary: int = json.get("player", {}).get("weapons", {}).get("weapon_2", {}).get("ammo_clip", -1)
-		var ammo_clip_secondary: int = json.get("player", {}).get("weapons", {}).get("weapon_1", {}).get("ammo_clip", -1)
 		emit_signal("health_changed", health)
-		emit_signal("ammo_clip_primary_changed", ammo_clip_primary)
-		emit_signal("ammo_clip_secondary_changed", ammo_clip_secondary)
+
+		# FIXME: Weapon state fading doesn't work for the primary weapon, only for the secondary weapon.
+		var ammo_clip_primary: int = json.get("player", {}).get("weapons", {}).get("weapon_2", {}).get("ammo_clip", -1)
+		var ammo_clip_primary_max: int = json.get("player", {}).get("weapons", {}).get("weapon_2", {}).get("ammo_clip_max", -1)
+		var primary_state: String = json.get("player", {}).get("weapons", {}).get("weapon_2", {}).get("state", "")
+		emit_signal("ammo_clip_primary_changed", ammo_clip_primary, ammo_clip_primary_max, primary_state == "active")
+
+		var ammo_clip_secondary: int = json.get("player", {}).get("weapons", {}).get("weapon_1", {}).get("ammo_clip", -1)
+		var ammo_clip_secondary_max: int = json.get("player", {}).get("weapons", {}).get("weapon_1", {}).get("ammo_clip_max", -1)
+		var secondary_state: String = json.get("player", {}).get("weapons", {}).get("weapon_1", {}).get("state", "")
+		emit_signal("ammo_clip_secondary_changed", ammo_clip_secondary, ammo_clip_secondary_max, secondary_state == "active")
 
 		var response := Response.new()
 		response.body = "CS:GO CrosshairPlus GSI".to_ascii()
@@ -50,10 +63,14 @@ class GSIServer extends "res://httpserver.gd":
 func _ready() -> void:
 	# Required for per-pixel transparency to work.
 	get_viewport().transparent_bg = true
-	
+
+	# The window spawns centered, which means it's on top of the crosshair.
+	# Move window to be slightly below the crosshair.
+	OS.window_position.y += 75
+
 	# Comment out the line below to test health/ammo display without having to run CS:GO.
 	set_process(false)
-	
+
 	var __ = gsi_server.listen(SERVER_PORT)
 	__ = gsi_server.connect("health_changed", self, "set_health")
 	__ = gsi_server.connect("ammo_clip_primary_changed", self, "set_ammo_clip_primary")
@@ -78,22 +95,32 @@ func set_health(p_health: int):
 		health_progress.value = 0.0
 
 
-func set_ammo_clip_primary(p_ammo_clip: int):
+func set_ammo_clip_primary(p_ammo_clip: int, p_ammo_clip_max: int = -1, p_weapon_active: bool = true):
 	if p_ammo_clip >= 0:
 		ammo_clip_primary_label.text = str(p_ammo_clip)
 		ammo_clip_primary_progress.value = p_ammo_clip
-		ammo_clip_primary_control.modulate = ammo_clip_gradient.interpolate(p_ammo_clip / ammo_clip_primary_progress.max_value)
+		if p_ammo_clip_max >= 1:
+			ammo_clip_primary_progress.max_value = p_ammo_clip_max
+			ammo_clip_primary_control.modulate = ammo_clip_gradient.interpolate(p_ammo_clip / float(p_ammo_clip_max))
+		if not p_weapon_active:
+			# Weapon holstered or reloading. Fade out the label and progress bar.
+			ammo_clip_secondary_control.modulate.a = 0.6
 	else:
 		# Unknown (-1) ammo clip status.
 		ammo_clip_primary_label.text = ""
 		ammo_clip_primary_progress.value = 0.0
 
 
-func set_ammo_clip_secondary(p_ammo_clip: int):
+func set_ammo_clip_secondary(p_ammo_clip: int, p_ammo_clip_max: int = -1, p_weapon_active: bool = true):
 	if p_ammo_clip >= 0:
 		ammo_clip_secondary_label.text = str(p_ammo_clip)
 		ammo_clip_secondary_progress.value = p_ammo_clip
-		ammo_clip_secondary_control.modulate = ammo_clip_gradient.interpolate(p_ammo_clip / ammo_clip_secondary_progress.max_value)
+		if p_ammo_clip_max >= 1:
+			ammo_clip_secondary_progress.max_value = p_ammo_clip_max
+			ammo_clip_secondary_control.modulate = ammo_clip_gradient.interpolate(p_ammo_clip / float(p_ammo_clip_max))
+		if not p_weapon_active:
+			# Weapon holstered or reloading. Fade out the label and progress bar.
+			ammo_clip_secondary_control.modulate.a = 0.6
 	else:
 		# Unknown (-1) ammo clip status.
 		ammo_clip_secondary_label.text = ""
