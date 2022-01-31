@@ -1,6 +1,10 @@
 # https://github.com/xaltaq/GDHTTPServer/blob/master/httpserver.gd
 extends Reference
 
+# The polling delay in milliseconds. Higher values can save CPU usage (especially when idle),
+# at the cost of making requests complete slower.
+const POLL_DELAY = 1
+
 class Request:
 	extends Reference
 
@@ -51,7 +55,7 @@ class RequestParser:
 
 			var available_bytes := request.peer.get_available_bytes()
 			if available_bytes == 0:
-				OS.delay_msec(100)
+				OS.delay_msec(POLL_DELAY)
 				continue
 
 			var arr := request.peer.get_data(available_bytes)
@@ -207,7 +211,7 @@ func _listen_thread() -> void:
 func _take_connections() -> void:
 	while not _server_shutdown:
 		if not _server.is_connection_available():
-			OS.delay_msec(100)
+			OS.delay_msec(POLL_DELAY)
 			continue
 		var peer := _server.take_connection()
 		print_debug("Got peer: ", peer.get_connected_host(), ":", peer.get_connected_port())
