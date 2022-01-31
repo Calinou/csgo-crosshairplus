@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://ui.gd" type="Script" id=1]
 [ext_resource path="res://fonts/play_bold.tres" type="DynamicFontData" id=2]
@@ -14,6 +14,9 @@ default_font = SubResource( 1 )
 bg_color = Color( 1, 1, 1, 0.376471 )
 
 [sub_resource type="StyleBoxEmpty" id=4]
+
+[sub_resource type="DynamicFont" id=5]
+font_data = ExtResource( 2 )
 
 [node name="UI" type="Control"]
 anchor_right = 1.0
@@ -53,15 +56,53 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="AmmoClip" type="Control" parent="."]
+[node name="AmmoClipPrimary" type="Control" parent="."]
 margin_right = 40.0
 margin_bottom = 40.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="ProgressBar" type="ProgressBar" parent="AmmoClip"]
+[node name="ProgressBar" type="ProgressBar" parent="AmmoClipPrimary"]
 margin_left = 150.0
+margin_right = 224.0
+margin_bottom = 14.0
+rect_scale = Vector2( -1, 1 )
+custom_styles/fg = SubResource( 3 )
+custom_styles/bg = SubResource( 4 )
+max_value = 30.0
+step = 1.0
+value = 30.0
+percent_visible = false
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="AmmoClipPrimary"]
+margin_left = 53.0
+margin_top = -3.0
+margin_right = 149.0
+margin_bottom = 16.0
+custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
+custom_constants/shadow_offset_x = 2
+custom_constants/shadow_offset_y = 2
+custom_fonts/font = SubResource( 5 )
+text = "150"
+align = 2
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="AmmoClipSecondary" type="Control" parent="."]
+margin_right = 40.0
+margin_bottom = 40.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ProgressBar" type="ProgressBar" parent="AmmoClipSecondary"]
+margin_left = 150.0
+margin_top = 15.0
 margin_right = 224.0
 margin_bottom = 29.0
 rect_scale = Vector2( -1, 1 )
@@ -75,14 +116,15 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Label" type="Label" parent="AmmoClip"]
-margin_left = 51.0
-margin_top = -4.0
-margin_right = 147.0
-margin_bottom = 32.0
+[node name="Label" type="Label" parent="AmmoClipSecondary"]
+margin_left = 53.0
+margin_top = 12.0
+margin_right = 149.0
+margin_bottom = 31.0
 custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
 custom_constants/shadow_offset_x = 2
 custom_constants/shadow_offset_y = 2
+custom_fonts/font = SubResource( 5 )
 text = "150"
 align = 2
 __meta__ = {

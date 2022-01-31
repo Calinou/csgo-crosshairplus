@@ -9,14 +9,18 @@ var gsi_server := GSIServer.new()
 onready var health_control := $Health as Control
 onready var health_label := $Health/Label as Label
 onready var health_progress := $Health/ProgressBar as ProgressBar
-onready var ammo_clip_control := $AmmoClip as Control
-onready var ammo_clip_label := $AmmoClip/Label as Label
-onready var ammo_clip_progress := $AmmoClip/ProgressBar as ProgressBar
+onready var ammo_clip_primary_control := $AmmoClipPrimary as Control
+onready var ammo_clip_primary_label := $AmmoClipPrimary/Label as Label
+onready var ammo_clip_primary_progress := $AmmoClipPrimary/ProgressBar as ProgressBar
+onready var ammo_clip_secondary_control := $AmmoClipSecondary as Control
+onready var ammo_clip_secondary_label := $AmmoClipSecondary/Label as Label
+onready var ammo_clip_secondary_progress := $AmmoClipSecondary/ProgressBar as ProgressBar
 
 
 class GSIServer extends "res://httpserver.gd":
 	signal health_changed(health)
-	signal ammo_clip_changed(ammo_clip)
+	signal ammo_clip_primary_changed(ammo_clip)
+	signal ammo_clip_secondary_changed(ammo_clip)
 	
 	func _respond(request: Request) -> Response:
 		print("response")
@@ -29,12 +33,14 @@ class GSIServer extends "res://httpserver.gd":
 #		body.append_array("Body: ".to_ascii())
 #		body.append_array(request.request_data)
 
-
 		var json: Dictionary = parse_json(request.request_data.get_string_from_ascii())
+		
 		var health: int = json.get("player", {}).get("state", {}).get("health", -1)
-		var ammo_clip: int = json.get("player", {}).get("weapons", {}).get("weapon_2", {}).get("ammo_clip", -1)
+		var ammo_clip_primary: int = json.get("player", {}).get("weapons", {}).get("weapon_2", {}).get("ammo_clip", -1)
+		var ammo_clip_secondary: int = json.get("player", {}).get("weapons", {}).get("weapon_1", {}).get("ammo_clip", -1)
 		emit_signal("health_changed", health)
-		emit_signal("ammo_clip_changed", ammo_clip)
+		emit_signal("ammo_clip_primary_changed", ammo_clip_primary)
+		emit_signal("ammo_clip_secondary_changed", ammo_clip_secondary)
 
 		var response := Response.new()
 		response.body = "CS:GO CrosshairPlus GSI".to_ascii()
@@ -50,13 +56,15 @@ func _ready() -> void:
 	
 	var __ = gsi_server.listen(SERVER_PORT)
 	__ = gsi_server.connect("health_changed", self, "set_health")
-	__ = gsi_server.connect("ammo_clip_changed", self, "set_ammo_clip")
+	__ = gsi_server.connect("ammo_clip_primary_changed", self, "set_ammo_clip_primary")
+	__ = gsi_server.connect("ammo_clip_secondary_changed", self, "set_ammo_clip_secondary")
 
 
 func _process(_delta: float) -> void:
 	if Engine.get_idle_frames() % 15 == 0:
 		set_health(int(health_label.text) - 1)
-		set_ammo_clip(int(ammo_clip_label.text) - 1)
+		set_ammo_clip_primary(int(ammo_clip_primary_label.text) - 1)
+		set_ammo_clip_secondary(int(ammo_clip_secondary_label.text) - 1)
 
 
 func set_health(p_health: int):
@@ -70,12 +78,23 @@ func set_health(p_health: int):
 		health_progress.value = 0.0
 
 
-func set_ammo_clip(p_ammo_clip: int):
+func set_ammo_clip_primary(p_ammo_clip: int):
 	if p_ammo_clip >= 0:
-		ammo_clip_label.text = str(p_ammo_clip)
-		ammo_clip_progress.value = p_ammo_clip
-		ammo_clip_control.modulate = ammo_clip_gradient.interpolate(p_ammo_clip / ammo_clip_progress.max_value)
+		ammo_clip_primary_label.text = str(p_ammo_clip)
+		ammo_clip_primary_progress.value = p_ammo_clip
+		ammo_clip_primary_control.modulate = ammo_clip_gradient.interpolate(p_ammo_clip / ammo_clip_primary_progress.max_value)
 	else:
 		# Unknown (-1) ammo clip status.
-		ammo_clip_label.text = ""
-		ammo_clip_progress.value = 0.0
+		ammo_clip_primary_label.text = ""
+		ammo_clip_primary_progress.value = 0.0
+
+
+func set_ammo_clip_secondary(p_ammo_clip: int):
+	if p_ammo_clip >= 0:
+		ammo_clip_secondary_label.text = str(p_ammo_clip)
+		ammo_clip_secondary_progress.value = p_ammo_clip
+		ammo_clip_secondary_control.modulate = ammo_clip_gradient.interpolate(p_ammo_clip / ammo_clip_secondary_progress.max_value)
+	else:
+		# Unknown (-1) ammo clip status.
+		ammo_clip_secondary_label.text = ""
+		ammo_clip_secondary_progress.value = 0.0
