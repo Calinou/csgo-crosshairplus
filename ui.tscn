@@ -5,6 +5,8 @@
 
 [sub_resource type="DynamicFont" id=1]
 size = 28
+outline_size = 2
+outline_color = Color( 0, 0, 0, 0.752941 )
 font_data = ExtResource( 2 )
 
 [sub_resource type="Theme" id=2]
@@ -16,6 +18,8 @@ bg_color = Color( 1, 1, 1, 0.376471 )
 [sub_resource type="StyleBoxEmpty" id=4]
 
 [sub_resource type="DynamicFont" id=5]
+outline_size = 2
+outline_color = Color( 0, 0, 0, 0.752941 )
 font_data = ExtResource( 2 )
 
 [node name="UI" type="Control"]
@@ -45,12 +49,9 @@ __meta__ = {
 
 [node name="Label" type="Label" parent="Health"]
 margin_left = 3.0
-margin_top = -4.0
+margin_top = -3.0
 margin_right = 102.0
-margin_bottom = 32.0
-custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
-custom_constants/shadow_offset_x = 2
-custom_constants/shadow_offset_y = 2
+margin_bottom = 33.0
 text = "100"
 __meta__ = {
 "_edit_use_anchors_": false
@@ -95,12 +96,9 @@ __meta__ = {
 
 [node name="Label" type="Label" parent="AmmoClipPrimary"]
 margin_left = 53.0
-margin_top = -3.0
+margin_top = -2.0
 margin_right = 149.0
-margin_bottom = 16.0
-custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
-custom_constants/shadow_offset_x = 2
-custom_constants/shadow_offset_y = 2
+margin_bottom = 17.0
 custom_fonts/font = SubResource( 5 )
 text = "150"
 align = 2
@@ -148,12 +146,9 @@ __meta__ = {
 
 [node name="Label" type="Label" parent="AmmoClipSecondary"]
 margin_left = 53.0
-margin_top = 12.0
+margin_top = 13.0
 margin_right = 149.0
-margin_bottom = 31.0
-custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
-custom_constants/shadow_offset_x = 2
-custom_constants/shadow_offset_y = 2
+margin_bottom = 32.0
 custom_fonts/font = SubResource( 5 )
 text = "30"
 align = 2
