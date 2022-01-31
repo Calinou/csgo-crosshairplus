@@ -80,8 +80,10 @@ func _ready() -> void:
 func _process(_delta: float) -> void:
 	if Engine.get_idle_frames() % 15 == 0:
 		set_health(int(health_label.text) - 1)
-		set_ammo_clip_primary(int(ammo_clip_primary_label.text) - 1)
-		set_ammo_clip_secondary(int(ammo_clip_secondary_label.text) - 1)
+		# Simulates a Negev + Dual Berettas loadout
+		# (weapons with the highest amount of bullets in a single ammo clip).
+		set_ammo_clip_primary(int(ammo_clip_primary_label.text) - 1, 150, true)
+		set_ammo_clip_secondary(int(ammo_clip_secondary_label.text) - 1, 30, false)
 
 
 func set_health(p_health: int):
@@ -95,7 +97,7 @@ func set_health(p_health: int):
 		health_progress.value = 0.0
 
 
-func set_ammo_clip_primary(p_ammo_clip: int, p_ammo_clip_max: int = -1, p_weapon_active: bool = true):
+func set_ammo_clip_primary(p_ammo_clip: int, p_ammo_clip_max: int, p_weapon_active: bool):
 	if p_ammo_clip >= 0:
 		ammo_clip_primary_label.text = str(p_ammo_clip)
 		ammo_clip_primary_progress.value = p_ammo_clip
@@ -111,7 +113,7 @@ func set_ammo_clip_primary(p_ammo_clip: int, p_ammo_clip_max: int = -1, p_weapon
 		ammo_clip_primary_progress.value = 0.0
 
 
-func set_ammo_clip_secondary(p_ammo_clip: int, p_ammo_clip_max: int = -1, p_weapon_active: bool = true):
+func set_ammo_clip_secondary(p_ammo_clip: int, p_ammo_clip_max: int, p_weapon_active: bool):
 	if p_ammo_clip >= 0:
 		ammo_clip_secondary_label.text = str(p_ammo_clip)
 		ammo_clip_secondary_progress.value = p_ammo_clip
