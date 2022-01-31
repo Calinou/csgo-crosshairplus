@@ -17,7 +17,7 @@ run/low_processor_mode=true
 [display]
 
 window/size/width=150
-window/size/height=26
+window/size/height=29
 window/size/resizable=false
 window/size/borderless=true
 window/size/always_on_top=true

@@ -1,11 +1,17 @@
 extends Control
 
 const SERVER_PORT = 7355
+const health_gradient = preload("res://ui/health_gradient.tres")
+const ammo_clip_gradient = preload("res://ui/ammo_clip_gradient.tres")
 
 var gsi_server := GSIServer.new()
 
-onready var health_label := $Health as Label
-onready var ammo_clip_label := $AmmoClip as Label
+onready var health_control := $Health as Control
+onready var health_label := $Health/Label as Label
+onready var health_progress := $Health/ProgressBar as ProgressBar
+onready var ammo_clip_control := $AmmoClip as Control
+onready var ammo_clip_label := $AmmoClip/Label as Label
+onready var ammo_clip_progress := $AmmoClip/ProgressBar as ProgressBar
 
 
 class GSIServer extends "res://httpserver.gd":
@@ -39,22 +45,37 @@ func _ready() -> void:
 	# Required for per-pixel transparency to work.
 	get_viewport().transparent_bg = true
 	
+	# Comment out the line below to test health/ammo display without having to run CS:GO.
+	set_process(false)
+	
 	var __ = gsi_server.listen(SERVER_PORT)
 	__ = gsi_server.connect("health_changed", self, "set_health")
 	__ = gsi_server.connect("ammo_clip_changed", self, "set_ammo_clip")
-	
+
+
+func _process(_delta: float) -> void:
+	if Engine.get_idle_frames() % 15 == 0:
+		set_health(int(health_label.text) - 1)
+		set_ammo_clip(int(ammo_clip_label.text) - 1)
+
 
 func set_health(p_health: int):
 	if p_health >= 1:
 		health_label.text = str(p_health)
+		health_progress.value = p_health
+		health_control.modulate = health_gradient.interpolate(p_health / health_progress.max_value)
 	else:
 		# Dead or unknown (-1) health.
 		health_label.text = ""
+		health_progress.value = 0.0
 
 
 func set_ammo_clip(p_ammo_clip: int):
 	if p_ammo_clip >= 0:
 		ammo_clip_label.text = str(p_ammo_clip)
+		ammo_clip_progress.value = p_ammo_clip
+		ammo_clip_control.modulate = ammo_clip_gradient.interpolate(p_ammo_clip / ammo_clip_progress.max_value)
 	else:
 		# Unknown (-1) ammo clip status.
 		ammo_clip_label.text = ""
+		ammo_clip_progress.value = 0.0
