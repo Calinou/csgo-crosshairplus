@@ -56,6 +56,21 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
+[node name="AmmoReservePrimary" type="ProgressBar" parent="."]
+margin_left = 76.0
+margin_top = 11.0
+margin_right = 150.0
+margin_bottom = 14.0
+custom_styles/fg = SubResource( 3 )
+custom_styles/bg = SubResource( 4 )
+max_value = 150.0
+step = 1.0
+value = 150.0
+percent_visible = false
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
 [node name="AmmoClipPrimary" type="Control" parent="."]
 margin_right = 40.0
 margin_bottom = 40.0
@@ -89,6 +104,21 @@ custom_constants/shadow_offset_y = 2
 custom_fonts/font = SubResource( 5 )
 text = "150"
 align = 2
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="AmmoReserveSecondary" type="ProgressBar" parent="."]
+margin_left = 76.0
+margin_top = 26.0
+margin_right = 150.0
+margin_bottom = 29.0
+custom_styles/fg = SubResource( 3 )
+custom_styles/bg = SubResource( 4 )
+max_value = 30.0
+step = 1.0
+value = 30.0
+percent_visible = false
 __meta__ = {
 "_edit_use_anchors_": false
 }
